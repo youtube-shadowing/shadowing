@@ -1,4 +1,14 @@
 $(function() {
+    let formatTime = function(seconds) {
+        let date = new Date(0);
+        date.setSeconds(seconds);
+        if (date.getUTCHours()) {
+            return date.toISOString().substr(11, 8);
+        } 
+        return date.toISOString().substr(14, 5);
+    };
+
+
     let Video = function(videoId) {
         this.id = videoId;
     };
@@ -36,11 +46,19 @@ $(function() {
                 success: data => {
                     let lines = $('<div class="lines"></div>');
                     let textList = $(data).find('text').map(function() {
-                        return $(this).text();
+                        return {
+                            text: $(this).text(),
+                            start: $(this).attr('start')
+                        };
                     }).toArray();
 
                     textList.forEach(item => {
-                        lines.append($('<p class="line"></p>').text(this.decode(item)))
+                        let start = formatTime(parseInt(item.start));
+                        let text = this.decode(item.text);
+                        let line = `<p class="line" 
+                                       data-start-formatted="${start}"
+                                       data-start="${item.start}">${text}</p>`;
+                        lines.append(line);
                     });
                     embedTo.append(lines);
                 }
@@ -104,20 +122,24 @@ $(function() {
             });
         },
 
-        togglePause: function() {
+        togglePause: function(stop, time) {
             if (!this.recorder) {
+                this.startTime = formatTime(time);
                 return this.start();
             }
 
             if (this.recorder.recording) {
                 this.recorder.stop();
+                if (stop) {
+                    this.stopTime = formatTime(time);
+                    this.stop();
+                }
             } else {
                 this.recorder.record();
             }
         },
 
         stop: function() {
-            this.recorder.stop();
             this.stream.getAudioTracks()[0].stop();
             this.recorder.exportWAV(blob => {
                 this.export(blob);
@@ -128,13 +150,13 @@ $(function() {
         export: function(blob) {
             let url = URL.createObjectURL(blob);
             let audio = $(`<div class="audio toast">
-                             <div class="audio-title">New Audio</div>
+                             <div class="audio-title">${this.startTime} - ${this.stopTime}</div>
                              <div class="d-flex">
                                <audio controls src="${url}"></audio>
-                               <button class="btn btn-sm">×</button>
+                               <button class="btn btn-sm">&times;</button>
                              </div>
                            </div>`);
-            this.list.append(audio);
+            this.list.prepend(audio);
         },
 
         reset: function() {
@@ -183,6 +205,7 @@ $(function() {
                 }
 
                 document.activeElement.blur();
+                this.result.find('.divider-vert').show();
                 return false;
             });
 
@@ -191,20 +214,19 @@ $(function() {
                     return;
                 }
 
-                if (e.keyCode == 32) {
-                    this.currentVideo.togglePause();  // space
-                    this.audio.togglePause();
+                if (e.keyCode == 32 || e.keyCode == 13) { // space
+                    let stop = e.keyCode == 13;           // enter
+                    let time = this.currentVideo.player.getCurrentTime();
+                    this.currentVideo.togglePause();  
+                    this.audio.togglePause(stop, time);
                 } else if (e.keyCode == 37) {
-                    this.currentVideo.backward();     // arrow left
+                    this.currentVideo.backward();         // arrow left
                 } else if (e.keyCode == 39) {
-                    this.currentVideo.forward();      // arrow right
+                    this.currentVideo.forward();          // arrow right
                 } else if (e.keyCode == 38) {
-                    this.currentVideo.faster();       // arrow up
+                    this.currentVideo.faster();           // arrow up
                 } else if (e.keyCode == 40) {
-                    this.currentVideo.slower();       // arrow down
-                } else if (e.keyCode == 13) {
-                    this.currentVideo.togglePause();  // enter
-                    this.audio.stop();
+                    this.currentVideo.slower();           // arrow down
                 }
 
                 return false;

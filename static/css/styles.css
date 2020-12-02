@@ -11,6 +11,21 @@
   overflow-y: auto;
 }
 
+#subtitles .line {
+  position: relative;
+  padding-left: 50px;
+}
+
+#subtitles .line::before {
+  content: attr(data-start-formatted);
+  position: absolute;
+  left: 0;
+  top: 3px;
+  font-size: 80%;
+  color: #d6d6ec;
+}
+
+
 #recordings {
   margin-top: 50px;
 }
@@ -32,4 +47,12 @@
 #recordings .audio button {
   font-size: 1.2rem;
   margin-left: 10px;
+}
+
+#result .divider-vert {
+  display: none;
+}
+
+#help .shortcut div.col-2 {
+  text-align: center;
 }
