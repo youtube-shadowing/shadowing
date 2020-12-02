@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <title>Shadowing</title>
+
+  <link rel="stylesheet" href="/static/css/spectre.min.css">
+  <link rel="stylesheet" href="/static/css/styles.css">
+
+  <script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+  <script type="text/javascript" src="/static/js/zepto.min.js"></script>
+  <script type="text/javascript" src="/static/js/recorder.js"></script>
+  <script type="text/javascript" src="/static/js/shadowing.js"></script>
+</head>
+<body>
+    <div class="container grid-lg">
+      <div class="columns header">
+        <div class="column col-8 col-mx-auto col-md-12">
+          <form id="link-form" class="input-group">
+            <input type="text" name="youtube_link" 
+                   class="form-input" placeholder="Youtube link"
+                   id="youtube-link">
+            <button type="submit" class="btn btn-primary input-group-btn button-load">Load</button>
+          </form>          
+        </div>
+      </div>
+
+      <div class="columns content" id="result">
+        <div class="column col-6 col-sm-12 video-responsive" id="video"></div>
+        <div class="divider-vert hide-sm"></div>
+        <div class="column col-sm-12" id="subtitles"></div>
+      </div>
+
+      <div class="columns">
+        <div class="column col-8 col-md-12 col-mx-auto">
+          <div id="recordings"></div>
+        </div>
+      </div>
+    </div>
+</body>
+</html>
