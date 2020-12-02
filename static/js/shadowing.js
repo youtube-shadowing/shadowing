@@ -177,6 +177,7 @@ $(function() {
 
         this.audio = new Audio($('#recordings'));
         this.bindEvents();
+        this.init();
     };
     Shadowing.prototype = {
         matchHost: 'www.youtube.com',
@@ -193,19 +194,34 @@ $(function() {
             return null;
         },
 
+        init: function() {
+            let url = new URL(location.href);
+            let id = url.searchParams.get(this.paramName);
+            if (id) {
+                setTimeout(() => {
+                    this.submit(id);   
+                }, 1000);
+            }
+        },
+
+        submit: function(id) {
+            if (!this.currentVideo || this.currentVideo.id != id) {
+                history.pushState('', `${document.title} - ${id}`, `?${this.paramName}=${id}`);
+                this.resetVideo();
+                this.loadVideo(id);
+                this.result.show();
+            }
+
+            document.activeElement.blur();
+            this.result.find('.divider-vert').show();
+        },
+
         bindEvents: function() {
             this.form.on('submit', e => {
                 let id = this.getVideoID(this.link.val());
                 if (id) {
-                    if (!this.currentVideo || this.currentVideo.id != id) {
-                        this.resetVideo();
-                        this.loadVideo(id);
-                        this.result.show();
-                    }
+                    this.submit(id);
                 }
-
-                document.activeElement.blur();
-                this.result.find('.divider-vert').show();
                 return false;
             });
 
