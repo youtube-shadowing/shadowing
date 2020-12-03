@@ -232,6 +232,8 @@ $(function() {
             let time = this.currentVideo.player.getCurrentTime();
             this.currentVideo.togglePause();  
             this.audio.togglePause(stop, time);
+
+            $('.button-play i').toggleClass('fa-play fa-stop');
         },
 
         bindEvents: function() {
@@ -244,7 +246,6 @@ $(function() {
             });
 
             $('.button-play').on('click', e => {
-                $(e.target).find('i').toggleClass('fa-play fa-stop');
                 this.toggle(true);
             });
 
