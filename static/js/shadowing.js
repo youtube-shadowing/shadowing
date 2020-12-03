@@ -80,6 +80,11 @@ $(function() {
             this.player.seekTo(currentTime + delta, true);
         },
 
+        seek: function(time) {
+            this.player.seekTo(time);
+            this.player.pauseVideo(); 
+        },
+
         forward: function() {
             this.relativeSeek(5);
         },
@@ -250,7 +255,11 @@ $(function() {
 
             $(document).on('click', '#recordings .audio button', function(e) {
                 $(this).closest('.audio').remove();
-            })
+            });
+
+            $(document).on('click', '#subtitles .line', e => {
+                this.currentVideo.seek($(e.target).attr('data-start'));
+            });
         },
 
         loadVideo: function(videoId) {

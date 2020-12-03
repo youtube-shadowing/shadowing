@@ -14,6 +14,7 @@
 #subtitles .line {
   position: relative;
   padding-left: 50px;
+  cursor: pointer;
 }
 
 #subtitles .line::before {
