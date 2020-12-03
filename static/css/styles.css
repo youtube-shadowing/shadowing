@@ -57,3 +57,11 @@
 #help .shortcut div.col-2 {
   text-align: center;
 }
+
+#controls {
+  margin: 30px 0;
+}
+
+#controls button {
+  width: 100%;
+}

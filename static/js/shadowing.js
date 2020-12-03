@@ -174,7 +174,6 @@ $(function() {
 
 
     let Shadowing = function() {
-        this.form = $('#link-form');
         this.link = $('#youtube-link');
         this.result = $('#result');
         this.video = $('#video');
@@ -185,14 +184,22 @@ $(function() {
         this.init();
     };
     Shadowing.prototype = {
-        matchHost: 'www.youtube.com',
-        paramName: 'v',
+        match: {
+            'www.youtube.com': function(url) {
+                return url.searchParams.get('v');
+            },
+            'youtu.be': function(url) {
+                return url.pathname.replace(/^\//, '');
+            }
+        },
+
+        paramName: 'id',
 
         getVideoID: function(input) {
             try {
                 let url = new URL(input);
-                if (url.host == this.matchHost) {
-                    return url.searchParams.get(this.paramName);
+                if (url.host in this.match) {
+                    return this.match[url.host](url);
                 }
             } catch(e) {}
 
@@ -221,14 +228,33 @@ $(function() {
             this.result.find('.divider-vert').show();
         },
 
+        toggle: function(stop) {
+            let time = this.currentVideo.player.getCurrentTime();
+            this.currentVideo.togglePause();  
+            this.audio.togglePause(stop, time);
+        },
+
         bindEvents: function() {
-            this.form.on('submit', e => {
+            $('#link-form').on('submit', e => {
                 let id = this.getVideoID(this.link.val());
                 if (id) {
                     this.submit(id);
                 }
                 return false;
             });
+
+            $('.button-play').on('click', e => {
+                $(e.target).find('i').toggleClass('fa-play fa-stop');
+                this.toggle(true);
+            });
+
+            $('.button-backward').on('click', e => {
+                this.currentVideo.backward();
+            })
+
+            $('.button-forward').on('click', e => {
+                this.currentVideo.forward();
+            })
 
             $(document).on('keyup', e => {
                 if (!this.currentVideo || !this.currentVideo.loaded) {
@@ -237,9 +263,7 @@ $(function() {
 
                 if (e.keyCode == 32 || e.keyCode == 13) { // space
                     let stop = e.keyCode == 13;           // enter
-                    let time = this.currentVideo.player.getCurrentTime();
-                    this.currentVideo.togglePause();  
-                    this.audio.togglePause(stop, time);
+                    this.toggle(stop);
                 } else if (e.keyCode == 37) {
                     this.currentVideo.backward();         // arrow left
                 } else if (e.keyCode == 39) {

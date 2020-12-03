@@ -6,6 +6,7 @@
 
   <link rel="stylesheet" href="/static/css/spectre.min.css">
   <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="/static/fontawesome/css/all.css">
 
   <script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
   <script type="text/javascript" src="/static/js/zepto.min.js"></script>
@@ -27,6 +28,26 @@
 
       <div class="columns content" id="result">
         <div class="column col-6 col-md-12" id="video"></div>
+
+        <div class="column col-md-12 show-md" id="controls">
+          <div class="columns controls">
+            <div class="column col-md-3">
+              <button class="btn button-backward"><i class="fa fa-backward"></i></button>
+            </div>
+            <div class="column col-md-6">
+              <button class="btn btn-primary button-play"><i class="fa fa-play"></i></button>
+            </div>
+            <div class="column col-md-3">
+              <button class="btn button-forward"><i class="fa fa-forward"></i></button>
+            </div>
+          </div>
+        </div>
+        <!--div class="columns hide-xs">
+          <button class="btn col-md-3 col-xs-2"><i class="fa fa-backward"></i></button>
+          <button class="btn btn-primary col-md-6 col-xs-8"><i class="fa fa-play"></i></button>
+          <button class="btn col-md-3 col-xs-2"><i class="fa fa-forward"></i></button>
+        </div-->
+
         <div class="divider-vert hide-md"></div>
         <div class="column col-md-12" id="subtitles"></div>
       </div>
