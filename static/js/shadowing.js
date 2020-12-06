@@ -15,10 +15,6 @@ $(function() {
     Video.prototype = {
         subtitlesUrl: 'https://video.google.com/timedtext?lang=en&v=',
 
-        onPlayerStateChange: function(event) {
-            // console.log(event);
-        },
-
         loadPlayer: function(embedTo) {
             embedTo.append('<div id="player"></div>')
             this.player = new YT.Player('player', {
@@ -28,7 +24,9 @@ $(function() {
                     onReady: e => {
                         this.loaded = true
                     },
-                    onStateChange: this.onPlayerStateChange
+                    onStateChange: e => {
+                        // console.log(e);
+                    }
                 }
             });
         },
@@ -216,6 +214,10 @@ $(function() {
             }
         },
 
+        blur: function() {
+            document.activeElement.blur();
+        },
+
         submit: function(id) {
             if (!this.currentVideo || this.currentVideo.id != id) {
                 history.pushState('', `${document.title} - ${id}`, `?${this.paramName}=${id}`);
@@ -224,7 +226,7 @@ $(function() {
                 this.result.show();
             }
 
-            document.activeElement.blur();
+            this.blur();
             this.result.find('.divider-vert').show();
         },
 
@@ -234,6 +236,11 @@ $(function() {
             this.audio.togglePause(stop, time);
 
             $('.button-play i').toggleClass('fa-play fa-stop');
+        },
+
+        tagsToIgnoreKeypress: {
+            audio: 1,
+            iframe: 1
         },
 
         bindEvents: function() {
@@ -261,6 +268,11 @@ $(function() {
                 if (!this.currentVideo || !this.currentVideo.loaded) {
                     return;
                 }
+                if (document.activeElement.tagName.toLowerCase() in this.tagsToIgnoreKeypress) {
+                    return;
+                }
+
+                this.blur();
 
                 if (e.keyCode == 32 || e.keyCode == 13) { // space
                     let stop = e.keyCode == 13;           // enter
@@ -275,7 +287,8 @@ $(function() {
                     this.currentVideo.slower();           // arrow down
                 }
 
-                return false;
+                e.preventDefault();
+                e.stopPropagation();
             });
 
             $(document).on('click', '#recordings .audio button', function(e) {
