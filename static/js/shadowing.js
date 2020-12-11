@@ -8,6 +8,46 @@ $(function() {
         return date.toISOString().substr(14, 5);
     };
 
+    let Stats = function() {
+    };
+    Stats.prototype = {
+        key: 'shadowing-stats',
+
+        load: function() {
+            let initial = {
+                total: 0,
+                byDate: {}
+            };
+            return JSON.parse(window.localStorage.getItem(this.key)) || initial;
+        },
+
+        formatDate: function(date) {
+            return date.toISOString().substr(0, 10);
+        },
+
+        start: function(time) {
+            this.startTime = time;
+        },
+
+        stop: function(time) {
+            let seconds = time - this.startTime;
+            let today = this.formatDate(new Date());
+            let data = this.load();
+            data.total += seconds;
+            data.byDate[today] = (data.byDate[today] || 0) + seconds;
+            delete this.startTime;
+
+            window.localStorage.setItem(this.key, JSON.stringify(data));
+        },
+
+        log: function() {
+            let data = this.load();
+            return Object.keys(data.byDate).map(item => {
+                return [item, formatTime(data.byDate[item])];
+            });
+        }
+    };
+
 
     let Video = function(videoId) {
         this.id = videoId;
@@ -109,6 +149,7 @@ $(function() {
     let Audio = function(list) {
         this.list = list;
         this.reset();
+        this.stats = new Stats();
     };
     Audio.prototype = {
         start: function() {
@@ -127,6 +168,7 @@ $(function() {
 
         togglePause: function(stop, time) {
             if (!this.recorder) {
+                this.stats.start(time);
                 this.startTime = formatTime(time);
                 return this.start();
             }
@@ -134,6 +176,7 @@ $(function() {
             if (this.recorder.recording) {
                 this.recorder.stop();
                 if (stop) {
+                    this.stats.stop(time);
                     this.stopTime = formatTime(time);
                     this.stop();
                 }
@@ -285,6 +328,8 @@ $(function() {
                     this.currentVideo.faster();           // arrow up
                 } else if (e.keyCode == 40) {
                     this.currentVideo.slower();           // arrow down
+                } else if (e.keyCode == 27) {
+                    this.logStats();                      // escape
                 }
 
                 e.preventDefault();
@@ -297,6 +342,14 @@ $(function() {
 
             $(document).on('click', '#subtitles .line', e => {
                 this.currentVideo.seek($(e.target).attr('data-start'));
+            });
+        },
+
+        logStats: function() {
+            let data = this.audio.stats.log();
+            let help = $('#help').html('');
+            data.forEach(item => {
+                help.append(`<div>${item[0]}: ${item[1]}</div>`);
             });
         },
 
